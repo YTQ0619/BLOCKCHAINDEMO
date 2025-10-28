@@ -1,5 +1,5 @@
 // 引入Block类，用于创建区块对象
-const Block = require('./Block.js');
+const Block = require('./block.js');
 // 引入node.js的crypto模块，用于SHA-256加密哈希计算
 const crypto = require('crypto');
 

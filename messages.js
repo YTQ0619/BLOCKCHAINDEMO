@@ -1,4 +1,4 @@
-const messageType = require('./messages-type');
+const messageType = require('./messages-type.js');
 const  {
     REQUEST_LATEST_BLOCK,
     RECEIVE_LATEST_BLOCK,
