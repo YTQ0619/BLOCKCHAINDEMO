@@ -12,7 +12,7 @@ function cli(vorpal) {
 module.exports = cli;
 
 function welcome(vorpal) {
-  vorpal.log('Welcome to blockchain dli');
+  vorpal.log('Welcome to blockchain cli');
   vorpal.exec('help');
 
 }
@@ -23,7 +23,7 @@ function connectCommand(vorpal) {
     .action(function (args, callback) {
       if (args.host && args.port) {
         try {
-          P2p.connectToPeer(args.host, args.port);
+          p2p.connectToPeer(args.host, args.port);
         } catch (err) {
           this.log(err.message);
         }
@@ -58,8 +58,8 @@ function blockchainCommand(vorpal) {
 function peersCommand(vorpal) {
   vorpal.command('peers', 'get the list of connected peers.')
     .alias('p').action(function (args, callback) {
-      p2p.array.forEach(element => {
-        this.log(`${peer.pxpPeer.socket._host}\n`);
+      p2p.peers.forEach(element => {
+        this.log(`${peer.remoteAddress}\n`);
       }, this);
 
       callback();

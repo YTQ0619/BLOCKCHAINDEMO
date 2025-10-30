@@ -26,7 +26,7 @@ class PeerToPeer {
   }
   //链接到指定对等节点
   connectToPeer(host, port) {
-    const socket = net.connet(port, host, () => {
+    const socket = net.connect(port, host, () => {
       console.log(`Connected to peer ${host}:${port}`);
       this.initConnection(socket);
 
@@ -34,10 +34,10 @@ class PeerToPeer {
     socket.on('error', (err) => {
       console.log(`Error connecting to peer ${host}:${port}`, err.Message);
     })
-  }
+  }    
   //关闭说有连接
   closeConnections() {
-    this.peers, forEach((peer) => {
+    this.peers.forEach((peer) => {
       try {
         peer.end();
 
@@ -52,7 +52,9 @@ class PeerToPeer {
 
   //广播最新区块
   broadcastLatestBlock() {
-    this.broadcastLatestBlock(Message.sendLatestBlock(this.blockchain.latestBlock));
+    this.peers.forEach(peer => {
+      this.write(peer, Message.sendLatestBlock(this.blockchain.latestBlock));
+    });
   }
 
   //向所有连接的节点发送消息
@@ -62,14 +64,14 @@ class PeerToPeer {
   //初始化新连接
   initConnection(connection) {
     const existingPeer = this.peers.find(peer => {
-      peer.remoteAddress === connection.remotAddress && peer.remotePort === connection.remotePort
+      peer.remoteAddress === connection.remoteAddress && peer.remotePort === connection.remotePort
     });
     if (!existingPeer) {
       this.peers.push(connection);
       console.log(`New peer connected: ${connection.remoteAddress}:${connection.remotePort}`);
       this.initMessageHandler(connection);
       this.initErrorHandler(connection);
-      this.write(connection, Message.requestLatestBlock());
+      this.write(connection, Message.getLatestBlock());
     }
   }
 
@@ -122,11 +124,11 @@ class PeerToPeer {
     switch (message.type) {
       case REQUEST_LATEST_BLOCK:
         // 当收到请求最新区块的消息时，发送最新区块
-        this.write(peer, Messages.sendLatestBlock(this.blockchain.latestBlock));
+        this.write(peer, Message.sendLatestBlock(this.blockchain.latestBlock));
         break;
       case REQUEST_BLOCKCHAIN:
         // 当收到请求整个区块链的消息时，发送整个区块链
-        this.write(peer, Messages.sendBlockchain(this.blockchain.get()));
+        this.write(peer, Message.sendBlockchain(this.blockchain.get()));
         break;
       case RECEIVE_LATEST_BLOCK:
         // 当收到最新区块时，处理该区块
